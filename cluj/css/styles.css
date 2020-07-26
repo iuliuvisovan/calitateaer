@@ -24,7 +24,7 @@ h2 {
   max-width: calc(100vw - 183px);
 }
 
-.city-outline {
+.cluj-outline {
   width: 340px;
   margin-top: 25px;
   margin-bottom: -15px;
@@ -269,7 +269,7 @@ h2 {
   }
 }
 
-.city-outline {
+.cluj-outline {
   width: calc(100vw - 40px);
   max-width: 370px;
   margin-bottom: -20px;
