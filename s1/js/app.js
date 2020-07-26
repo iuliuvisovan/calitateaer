@@ -1,15 +1,45 @@
-let allClujDevices = [];
+const neighbourhoods = [
+  {
+    id: 'grivita',
+    name: 'Grivița',
+    imageUrl: 'img/cartiere/grivita.png',
+    deviceIds: ['160001B2'],
+  },
+  {
+    id: 'garadenord',
+    name: 'Gara de Nord',
+    imageUrl: 'img/cartiere/garadenord.png',
+    deviceIds: ['160001B3'],
+  },
+  {
+    id: 'baneasa',
+    name: 'Băneasa',
+    imageUrl: 'img/cartiere/baneasa.png',
+    deviceIds: ['160001B5'],
+  },
+  {
+    id: 'bucurestiinoi',
+    name: 'Bucureștii Noi',
+    imageUrl: 'img/cartiere/bucurestiinoi.png',
+    deviceIds: ['160001B7'],
+  },
+
+];
+
+let allSensors = [];
 
 async function getAndDisplayData() {
   drawNeighborhoods();
-  await getAndPopulateClujDevices();
+  await getAndPopulateSensorList();
   drawNeighborhoods();
 
-  setInterval(async () => {
-    await getAndPopulateClujDevices();
-    drawNeighborhoods();
-  }, 20 * 1000);
+  // setInterval(async () => {
+  //   await getAndPopulateSensorList();
+  //   drawNeighborhoods();
+  // }, 20 * 1000);
 }
+
+getAndDisplayData();
 
 function drawNeighborhoods() {
   const pageRoot = document.getElementById('root');
@@ -17,7 +47,6 @@ function drawNeighborhoods() {
   pageRoot.innerHTML = '';
 
   neighbourhoods
-    .filter((x) => x.shouldShow)
     .forEach(({ id, name, imageUrl }) => {
       const overallGrade = getAirQualityForNeighbourhood(id);
 
@@ -29,7 +58,7 @@ function drawNeighborhoods() {
     });
 }
 
-async function getAndPopulateClujDevices() {
+async function getAndPopulateSensorList() {
   const response = await fetch('https://data.uradmonitor.com/api/v1/devices/', {
     method: 'GET',
     mode: 'cors',
@@ -44,7 +73,7 @@ async function getAndPopulateClujDevices() {
   });
   const devices = await response.json();
 
-  allClujDevices = devices.filter((x) => x.city.toLowerCase().includes('cluj'));
+  allSensors = devices;
 }
 
 function isBroken(sensor) {
@@ -57,7 +86,7 @@ function isBroken(sensor) {
 
 function getAirQualityForNeighbourhood(neighbourhoodId) {
   const deviceIdsInNeighbourhood = neighbourhoods.find((x) => x.id == neighbourhoodId).deviceIds;
-  const sensorsInNeighbourhood = allClujDevices.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter((x) => !isBroken(x));
+  const sensorsInNeighbourhood = allSensors.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter((x) => !isBroken(x));
 
   if (!sensorsInNeighbourhood.length) {
     return '';
@@ -92,7 +121,7 @@ function getAirQualityForNeighbourhood(neighbourhoodId) {
 
 function getPmAveragesForNeighborhood(neighbourhoodId) {
   const deviceIdsInNeighbourhood = neighbourhoods.find((x) => x.id == neighbourhoodId).deviceIds;
-  const devicesInNeighbourhood = allClujDevices.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter(x => !isBroken(x));
+  const devicesInNeighbourhood = allSensors.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter(x => !isBroken(x));
 
   let averages = {
     pm1: 0,
@@ -102,9 +131,6 @@ function getPmAveragesForNeighborhood(neighbourhoodId) {
 
   devicesInNeighbourhood.forEach((sensor) => {
     const { avg_pm1, avg_pm25, avg_pm10 } = sensor;
-    // const avg_pm1 = 20;
-    // const avg_pm25 = 25;
-    // const avg_pm10 = 40;
 
     averages.pm1 += +avg_pm1;
     averages.pm25 += +avg_pm25;
@@ -117,51 +143,6 @@ function getPmAveragesForNeighborhood(neighbourhoodId) {
     pm10: averages.pm10 / devicesInNeighbourhood.length,
   };
 }
-
-const neighbourhoods = [
-  {
-    id: 'grigorescu',
-    name: 'Grigorescu',
-    imageUrl: 'img/cartiere/grigorescu.jpg',
-    deviceIds: ['160000C7'],
-    shouldShow: true,
-  },
-  {
-    id: 'plopilor',
-    name: 'Plopilor',
-    imageUrl: 'img/cartiere/plopilor.jpg',
-    deviceIds: ['160000CB'],
-    shouldShow: true,
-  },
-  {
-    id: 'manastur',
-    name: 'Mănăștur',
-    deviceIds: ['160000CA'],
-    shouldShow: true,
-    imageUrl: 'img/cartiere/manastur.jpg',
-  },
-  {
-    id: 'bunaziua',
-    name: 'Bună Ziua',
-    deviceIds: ['160000D3', '160000A2', '160000A5'],
-    imageUrl: 'img/cartiere/bunaziua.jpg',
-    shouldShow: true,
-  },
-  {
-    id: 'europa',
-    name: 'Europa',
-    deviceIds: ['160000FA', '160000C6', '820001CF'],
-    imageUrl: 'img/cartiere/europa.jpg',
-    shouldShow: true,
-  },
-  {
-    id: 'dambulrotund',
-    name: 'Dâmbul Rotund',
-    deviceIds: ['82000141'],
-  },
-];
-
-getAndDisplayData();
 
 function getHtmlForNeighbourhood({ id, name, value, imageUrl, pm1, pm25, pm10 }) {
   return `
@@ -178,11 +159,7 @@ function getHtmlForNeighbourhood({ id, name, value, imageUrl, pm1, pm25, pm10 })
         ${getHtmlForProgressBar({ name: 'PM10', value: pm10, legalValue: 40 })}
       </div>
       <div class="gradient"></div>
-      <img
-        src="${imageUrl}"
-        style="height: 250px;"
-        alt="Cartierul ${name}"
-      />
+      <img src="${imageUrl}" alt="Cartierul ${name}" />
     </div>
   </div>
     `;
