@@ -33,10 +33,10 @@ async function getAndDisplayData() {
   await getAndPopulateSensorList();
   drawNeighborhoods();
 
-  // setInterval(async () => {
-  //   await getAndPopulateSensorList();
-  //   drawNeighborhoods();
-  // }, 20 * 1000);
+  setInterval(async () => {
+    await getAndPopulateSensorList();
+    drawNeighborhoods();
+  }, 20 * 1000);
 }
 
 getAndDisplayData();
