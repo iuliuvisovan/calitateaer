@@ -1,17 +1,17 @@
 <html>
   <head>
-    <title>ClujAir - Calitatea Aerului in Cluj-Napoca</title>
+    <title>ClujAir - Calitatea Aerului in județul Cluj</title>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <meta name="author" content="USR Filiala Cluj" />
-    <meta name="description" content="ClujAir - Calitatea Aerului in Cluj-Napoca" />
+    <meta name="description" content="ClujAir - Calitatea Aerului in județul Cluj" />
     <meta name="author" content="USR Filiala Cluj" />
     <meta name="theme-color" content="#01a0e4" />
     <meta property="og:url" content="http://iuliu.net/clujair" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="ClujAir - Calitatea Aerului in Cluj-Napoca" />
-    <meta property="og:description" content="ClujAir - Calitatea aerului in cartierele din Cluj-Napoca" />
+    <meta property="og:title" content="ClujAir - Calitatea Aerului in județul Cluj" />
+    <meta property="og:description" content="ClujAir - Calitatea aerului in cartierele din județul Cluj" />
     <meta property="og:image" content="https://www.iuliu.net/clujair/img/ogimage.png" />
     <link rel="stylesheet" href="css/styles.css?v=10" />
     <link id="favicon" rel="icon" href="img/favicon.png" type="image/png" sizes="16x16" />
@@ -22,9 +22,15 @@
       <img class="cluj-outline" src="./img/cluj-outline.svg" alt="Cluj Outline" />
       <div class="logo-title-wrapper">
         <img src="img/usr-logo.png" alt="USR Logo" class="usr-logo-static" />
-        <h2 class="title">Calitatea Aerului în Cluj-Napoca</h2>
+        <h2 class="title">Calitatea Aerului în județul Cluj</h2>
       </div>
       <img src="img/usr-logo.png" alt="USR Logo" class="usr-logo-fixed" />
+      <div class="city-picker">
+        <span class="city-option selected" id="clujNapoca">Cluj-Napoca</span>
+        <span class="city-option" id="dej">Dej</span>
+        <span class="city-option" id="jucu">Jucu</span>
+        <span class="city-option" id="apahida">Apahida</span>
+      </div>
       <div id="root" class="neighborhoods-wrapper"></div>
       <div style="max-width: 800px; padding: 0 25px; font-weight: 400; margin: 45px 0;">
         <h3>
@@ -66,6 +72,6 @@
         </span>
       </div>
     </div>
-    <script src="js/app.js?v=10"></script>
   </body>
+  <script src="js/app.js?v=10"></script>
 </html>

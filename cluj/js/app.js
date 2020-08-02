@@ -1,14 +1,14 @@
-let allClujDevices = [];
+let allSensors = [];
 
 async function getAndDisplayData() {
   drawNeighborhoods();
   await getAndPopulateClujDevices();
   drawNeighborhoods();
 
-  setInterval(async () => {
-    await getAndPopulateClujDevices();
-    drawNeighborhoods();
-  }, 20 * 1000);
+  // setInterval(async () => {
+  //   await getAndPopulateClujDevices();
+  //   drawNeighborhoods();
+  // }, 20 * 1000);
 }
 
 function drawNeighborhoods() {
@@ -16,17 +16,15 @@ function drawNeighborhoods() {
 
   pageRoot.innerHTML = '';
 
-  neighbourhoods
-    .filter((x) => x.shouldShow)
-    .forEach(({ id, name, imageUrl }) => {
-      const overallGrade = getAirQualityForNeighbourhood(id);
+  neighbourhoods.forEach(({ id, name, imageUrl }) => {
+    const overallGrade = getGradeForNeighborhood(id);
 
-      const { pm1, pm25, pm10 } = getPmAveragesForNeighborhood(id);
+    const { pm1, pm25, pm10 } = getPmAveragesForNeighborhood(id);
 
-      const neighbourhoodHtml = getHtmlForNeighbourhood({ id, name, value: overallGrade, imageUrl, pm1, pm25, pm10 });
+    const neighbourhoodHtml = getHtmlForNeighbourhood({ id, name, value: overallGrade, imageUrl, pm1, pm25, pm10 });
 
-      pageRoot.insertAdjacentHTML('beforeend', neighbourhoodHtml);
-    });
+    pageRoot.insertAdjacentHTML('beforeend', neighbourhoodHtml);
+  });
 }
 
 async function getAndPopulateClujDevices() {
@@ -42,34 +40,43 @@ async function getAndPopulateClujDevices() {
     redirect: 'follow',
     referrerPolicy: 'no-referrer',
   });
-  const devices = await response.json();
 
-  allClujDevices = devices.filter((x) => x.city.toLowerCase().includes('cluj'));
+  allSensors = await response.json();
 }
 
-function isBroken(sensor) {
-  const { avg_pm1, avg_pm25, avg_pm10 } = sensor;
+function isAvailable(sensor) {
+  const { avg_pm1, avg_pm25, avg_pm10, status } = sensor;
 
-  if (avg_pm1 > 100 || avg_pm25 > 100 || avg_pm10 > 100) {
-    return true;
+  if (status !== '1') {
+    return false;
   }
+
+  if (avg_pm1 > 80 || avg_pm25 > 80 || avg_pm10 > 80) {
+    return false;
+  }
+
+  return true;
 }
 
-function getAirQualityForNeighbourhood(neighbourhoodId) {
+function getGradeForNeighborhood(neighbourhoodId) {
   const deviceIdsInNeighbourhood = neighbourhoods.find((x) => x.id == neighbourhoodId).deviceIds;
-  const sensorsInNeighbourhood = allClujDevices.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter((x) => !isBroken(x));
+  const sensorsInNeighborhood = allSensors.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter((x) => isAvailable(x));
 
-  if (!sensorsInNeighbourhood.length) {
+  if (neighbourhoodId == 'grigorescu') {
+    console.log('sensorsInNeighborhood', sensorsInNeighborhood);
+  }
+
+  if (!sensorsInNeighborhood.length) {
     return '';
   }
 
-  if (!sensorsInNeighbourhood.length) {
+  if (!sensorsInNeighborhood.length) {
     return '';
   }
 
   let summedSensorGrades = 0;
 
-  sensorsInNeighbourhood.forEach((sensor) => {
+  sensorsInNeighborhood.forEach((sensor) => {
     const { avg_pm1, avg_pm25, avg_pm10 } = sensor;
 
     const pm1Percentage = (+avg_pm1 / 20) * 10;
@@ -85,14 +92,18 @@ function getAirQualityForNeighbourhood(neighbourhoodId) {
     summedSensorGrades += valueForSensor;
   });
 
-  const averagedGradeForAllSensors = summedSensorGrades / sensorsInNeighbourhood.length;
+  const averagedGradeForAllSensors = summedSensorGrades / sensorsInNeighborhood.length;
 
   return averagedGradeForAllSensors.toFixed(1);
 }
 
 function getPmAveragesForNeighborhood(neighbourhoodId) {
   const deviceIdsInNeighbourhood = neighbourhoods.find((x) => x.id == neighbourhoodId).deviceIds;
-  const devicesInNeighbourhood = allClujDevices.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter(x => !isBroken(x));
+  const devicesInNeighbourhood = allSensors.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter((x) => isAvailable(x));
+
+  if (neighbourhoodId == 'grigorescu') {
+    console.log('devicesInNeighbourhood', devicesInNeighbourhood);
+  }
 
   let averages = {
     pm1: 0,
@@ -102,9 +113,6 @@ function getPmAveragesForNeighborhood(neighbourhoodId) {
 
   devicesInNeighbourhood.forEach((sensor) => {
     const { avg_pm1, avg_pm25, avg_pm10 } = sensor;
-    // const avg_pm1 = 20;
-    // const avg_pm25 = 25;
-    // const avg_pm10 = 40;
 
     averages.pm1 += +avg_pm1;
     averages.pm25 += +avg_pm25;
@@ -120,24 +128,33 @@ function getPmAveragesForNeighborhood(neighbourhoodId) {
 
 const neighbourhoods = [
   {
+    id: 'centru',
+    name: 'Centru',
+    imageUrl: 'img/cartiere/centru.jpg',
+    deviceIds: ['16000139'],
+  },
+  {
+    id: 'gruia',
+    name: 'Gruia',
+    imageUrl: 'img/cartiere/gruia.jpg',
+    deviceIds: ['16000138'],
+  },
+  {
     id: 'grigorescu',
     name: 'Grigorescu',
     imageUrl: 'img/cartiere/grigorescu.jpg',
-    deviceIds: ['160000C7'],
-    shouldShow: true,
+    deviceIds: ['160000C7', '16000067'],
   },
   {
     id: 'plopilor',
     name: 'Plopilor',
     imageUrl: 'img/cartiere/plopilor.jpg',
     deviceIds: ['160000CB'],
-    shouldShow: true,
   },
   {
     id: 'manastur',
     name: 'Mănăștur',
     deviceIds: ['160000CA'],
-    shouldShow: true,
     imageUrl: 'img/cartiere/manastur.jpg',
   },
   {
@@ -145,23 +162,23 @@ const neighbourhoods = [
     name: 'Bună Ziua',
     deviceIds: ['160000D3', '160000A2', '160000A5'],
     imageUrl: 'img/cartiere/bunaziua.jpg',
-    shouldShow: true,
   },
   {
     id: 'europa',
     name: 'Europa',
     deviceIds: ['160000FA', '160000C6', '820001CF'],
     imageUrl: 'img/cartiere/europa.jpg',
-    shouldShow: true,
   },
   {
-    id: 'dambulrotund',
-    name: 'Dâmbul Rotund',
-    deviceIds: ['82000141'],
+    id: 'sopor',
+    name: 'Sopor',
+    deviceIds: ['16000115'],
+    imageUrl: 'img/cartiere/sopor.jpg',
   },
 ];
 
 getAndDisplayData();
+setupCityPicker();
 
 function getHtmlForNeighbourhood({ id, name, value, imageUrl, pm1, pm25, pm10 }) {
   return `
@@ -178,11 +195,7 @@ function getHtmlForNeighbourhood({ id, name, value, imageUrl, pm1, pm25, pm10 })
         ${getHtmlForProgressBar({ name: 'PM10', value: pm10, legalValue: 40 })}
       </div>
       <div class="gradient"></div>
-      <img
-        src="${imageUrl}"
-        style="height: 250px;"
-        alt="Cartierul ${name}"
-      />
+      <img src="${imageUrl}" alt="Cartierul ${name}" />
     </div>
   </div>
     `;
@@ -266,4 +279,19 @@ function getColor(value) {
   }
 
   return '#000';
+}
+
+function setupCityPicker() {
+  document.querySelectorAll('.city-option').forEach((x) => {
+    x.addEventListener('click', selectCity);
+  });
+}
+
+function selectCity(event) {
+  const cityId = event.target.id;
+
+  document.querySelectorAll('.city-option').forEach((x) => {
+    x.classList.remove('selected');
+  });
+  document.querySelector('#' + cityId).classList.add('selected');
 }
