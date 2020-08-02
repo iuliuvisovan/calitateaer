@@ -1,8 +1,9 @@
 let allSensors = [];
+let selectedCityId = 'cluj-napoca';
 
 async function getAndDisplayData() {
   drawNeighborhoods();
-  await getAndPopulateClujDevices();
+  await getAndPopulateDevices();
   drawNeighborhoods();
 
   // setInterval(async () => {
@@ -16,18 +17,18 @@ function drawNeighborhoods() {
 
   pageRoot.innerHTML = '';
 
-  neighbourhoods.forEach(({ id, name, imageUrl }) => {
+  neighborhoods[selectedCityId].forEach(({ id, name, imageUrl, type }) => {
     const overallGrade = getGradeForNeighborhood(id);
 
     const { pm1, pm25, pm10 } = getPmAveragesForNeighborhood(id);
 
-    const neighbourhoodHtml = getHtmlForNeighbourhood({ id, name, value: overallGrade, imageUrl, pm1, pm25, pm10 });
+    const neighborhoodHtml = getHtmlForNeighborhood({ id, name, type, value: overallGrade, imageUrl, pm1, pm25, pm10 });
 
-    pageRoot.insertAdjacentHTML('beforeend', neighbourhoodHtml);
+    pageRoot.insertAdjacentHTML('beforeend', neighborhoodHtml);
   });
 }
 
-async function getAndPopulateClujDevices() {
+async function getAndPopulateDevices() {
   const response = await fetch('https://data.uradmonitor.com/api/v1/devices/', {
     method: 'GET',
     mode: 'cors',
@@ -58,11 +59,11 @@ function isAvailable(sensor) {
   return true;
 }
 
-function getGradeForNeighborhood(neighbourhoodId) {
-  const deviceIdsInNeighbourhood = neighbourhoods.find((x) => x.id == neighbourhoodId).deviceIds;
-  const sensorsInNeighborhood = allSensors.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter((x) => isAvailable(x));
+function getGradeForNeighborhood(neighborhoodId) {
+  const deviceIdsInNeighborhood = neighborhoods[selectedCityId].find((x) => x.id == neighborhoodId).deviceIds;
+  const sensorsInNeighborhood = allSensors.filter((x) => deviceIdsInNeighborhood.includes(x.id)).filter((x) => isAvailable(x));
 
-  if (neighbourhoodId == 'grigorescu') {
+  if (neighborhoodId == 'grigorescu') {
     console.log('sensorsInNeighborhood', sensorsInNeighborhood);
   }
 
@@ -97,12 +98,12 @@ function getGradeForNeighborhood(neighbourhoodId) {
   return averagedGradeForAllSensors.toFixed(1);
 }
 
-function getPmAveragesForNeighborhood(neighbourhoodId) {
-  const deviceIdsInNeighbourhood = neighbourhoods.find((x) => x.id == neighbourhoodId).deviceIds;
-  const devicesInNeighbourhood = allSensors.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter((x) => isAvailable(x));
+function getPmAveragesForNeighborhood(neighborhoodId) {
+  const deviceIdsInNeighborhood = neighborhoods[selectedCityId].find((x) => x.id == neighborhoodId).deviceIds;
+  const devicesInNeighborhood = allSensors.filter((x) => deviceIdsInNeighborhood.includes(x.id)).filter((x) => isAvailable(x));
 
-  if (neighbourhoodId == 'grigorescu') {
-    console.log('devicesInNeighbourhood', devicesInNeighbourhood);
+  if (neighborhoodId == 'grigorescu') {
+    console.log('devicesInNeighborhood', devicesInNeighborhood);
   }
 
   let averages = {
@@ -111,7 +112,7 @@ function getPmAveragesForNeighborhood(neighbourhoodId) {
     pm10: 0,
   };
 
-  devicesInNeighbourhood.forEach((sensor) => {
+  devicesInNeighborhood.forEach((sensor) => {
     const { avg_pm1, avg_pm25, avg_pm10 } = sensor;
 
     averages.pm1 += +avg_pm1;
@@ -120,71 +121,101 @@ function getPmAveragesForNeighborhood(neighbourhoodId) {
   });
 
   return {
-    pm1: averages.pm1 / devicesInNeighbourhood.length,
-    pm25: averages.pm25 / devicesInNeighbourhood.length,
-    pm10: averages.pm10 / devicesInNeighbourhood.length,
+    pm1: averages.pm1 / devicesInNeighborhood.length,
+    pm25: averages.pm25 / devicesInNeighborhood.length,
+    pm10: averages.pm10 / devicesInNeighborhood.length,
   };
 }
 
-const neighbourhoods = [
-  {
-    id: 'centru',
-    name: 'Centru',
-    imageUrl: 'img/cartiere/centru.jpg',
-    deviceIds: ['16000139'],
-  },
-  {
-    id: 'gruia',
-    name: 'Gruia',
-    imageUrl: 'img/cartiere/gruia.jpg',
-    deviceIds: ['16000138'],
-  },
-  {
-    id: 'grigorescu',
-    name: 'Grigorescu',
-    imageUrl: 'img/cartiere/grigorescu.jpg',
-    deviceIds: ['160000C7', '16000067'],
-  },
-  {
-    id: 'plopilor',
-    name: 'Plopilor',
-    imageUrl: 'img/cartiere/plopilor.jpg',
-    deviceIds: ['160000CB'],
-  },
-  {
-    id: 'manastur',
-    name: 'Mănăștur',
-    deviceIds: ['160000CA'],
-    imageUrl: 'img/cartiere/manastur.jpg',
-  },
-  {
-    id: 'bunaziua',
-    name: 'Bună Ziua',
-    deviceIds: ['160000D3', '160000A2', '160000A5'],
-    imageUrl: 'img/cartiere/bunaziua.jpg',
-  },
-  {
-    id: 'europa',
-    name: 'Europa',
-    deviceIds: ['160000FA', '160000C6', '820001CF'],
-    imageUrl: 'img/cartiere/europa.jpg',
-  },
-  {
-    id: 'sopor',
-    name: 'Sopor',
-    deviceIds: ['16000115'],
-    imageUrl: 'img/cartiere/sopor.jpg',
-  },
-];
+const neighborhoods = {
+  'cluj-napoca': [
+    {
+      id: 'centru',
+      name: 'Centru',
+      type: 'Zona',
+      imageUrl: 'img/cartiere/centru.jpg',
+      deviceIds: ['16000139'],
+    },
+    {
+      id: 'gruia',
+      name: 'Gruia',
+      imageUrl: 'img/cartiere/gruia.jpg',
+      deviceIds: ['16000138'],
+    },
+    {
+      id: 'grigorescu',
+      name: 'Grigorescu',
+      imageUrl: 'img/cartiere/grigorescu.jpg',
+      deviceIds: ['160000C7', '16000067'],
+    },
+    {
+      id: 'plopilor',
+      name: 'Plopilor',
+      imageUrl: 'img/cartiere/plopilor.jpg',
+      deviceIds: ['160000CB'],
+    },
+    {
+      id: 'manastur',
+      name: 'Mănăștur',
+      deviceIds: ['160000CA'],
+      imageUrl: 'img/cartiere/manastur.jpg',
+    },
+    {
+      id: 'bunaziua',
+      name: 'Bună Ziua',
+      deviceIds: ['160000D3', '160000A2', '160000A5'],
+      imageUrl: 'img/cartiere/bunaziua.jpg',
+    },
+    {
+      id: 'europa',
+      name: 'Europa',
+      deviceIds: ['160000FA', '160000C6', '820001CF'],
+      imageUrl: 'img/cartiere/europa.jpg',
+    },
+    {
+      id: 'sopor',
+      name: 'Sopor',
+      deviceIds: ['16000115'],
+      imageUrl: 'img/cartiere/sopor.jpg',
+    },
+  ],
+  dej: [
+    {
+      id: 'dej',
+      type: 'Orașul',
+      name: 'Dej',
+      deviceIds: ['16000197'],
+      imageUrl: 'img/cartiere/dej.jpg',
+    },
+  ],
+  jucu: [
+    {
+      id: 'jucu',
+      type: 'Comuna',
+      name: 'Jucu',
+      deviceIds: ['160000D0'],
+      imageUrl: 'img/cartiere/jucu.jpg',
+    },
+  ],
+  apahida: [
+    {
+      id: 'apahida',
+      type: 'Comuna',
+      name: 'Apahida',
+      deviceIds: ['160000C9'],
+      imageUrl: 'img/cartiere/apahida.jpg',
+    },
+  ],
+};
 
 getAndDisplayData();
 setupCityPicker();
 
-function getHtmlForNeighbourhood({ id, name, value, imageUrl, pm1, pm25, pm10 }) {
+function getHtmlForNeighborhood({ id, name, value, type = "Cartierul", imageUrl, pm1, pm25, pm10 }) {
   return `
   <div class="neighborhood" id="${id}" style="background-color: ${getColor(value)}">
     <div class="header">
-      Cartierul&nbsp;
+      ${type}&nbsp;
       <span class="name">${name}</span>
     </div>
     <div class="body">
@@ -195,7 +226,7 @@ function getHtmlForNeighbourhood({ id, name, value, imageUrl, pm1, pm25, pm10 })
         ${getHtmlForProgressBar({ name: 'PM10', value: pm10, legalValue: 40 })}
       </div>
       <div class="gradient"></div>
-      <img src="${imageUrl}" alt="Cartierul ${name}" />
+      <img src="${imageUrl}" alt="${type} ${name}" />
     </div>
   </div>
     `;
@@ -294,4 +325,10 @@ function selectCity(event) {
     x.classList.remove('selected');
   });
   document.querySelector('#' + cityId).classList.add('selected');
+
+  selectedCityId = cityId;
+  drawNeighborhoods();
+  setTimeout(() => {
+    getAndPopulateDevices();
+  }, 0);
 }
