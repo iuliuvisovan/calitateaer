@@ -236,6 +236,10 @@ h2 {
   display: none;
 }
 
+.title {
+  display: inline-block;
+}
+
 @media (max-width: 1039px) {
   .usr-logo-fixed {
     display: none;
@@ -243,13 +247,7 @@ h2 {
   .usr-logo-static {
     display: inline-block;
   }
-}
 
-.title {
-  display: inline-block;
-}
-
-@media (max-width: 375px) {
   .title {
     max-width: 224px;
     text-align: right;
