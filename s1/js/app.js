@@ -11,12 +11,12 @@ const neighbourhoods = [
     imageUrl: 'img/cartiere/romana.jpg',
     deviceIds: ['160001B1'],
   },
-  // {
-  //   id: 'vatranoua',
-  //   name: 'Vatra Nouă',
-  //   imageUrl: 'img/cartiere/vatranoua.jpg',
-  //   deviceIds: ['160001B2'],
-  // },
+  {
+    id: 'vatranoua',
+    name: 'Vatra Nouă',
+    imageUrl: 'img/cartiere/vatranoua.jpg',
+    deviceIds: ['160001B2'],
+  },
   {
     id: 'garadenord',
     name: 'Gara de Nord',
@@ -42,15 +42,21 @@ const neighbourhoods = [
     deviceIds: ['160001B6'],
   },
   {
-    id: 'bucurestiinoi',
-    name: 'Bucureștii Noi',
-    imageUrl: 'img/cartiere/bucurestiinoi.jpg',
-    deviceIds: ['160001B7', '160001AF'],
+    id: 'bazilescu',
+    name: 'Bazilescu',
+    imageUrl: 'img/cartiere/bazilescu.jpg',
+    deviceIds: ['160001B7'],
   },
   {
     id: 'dorobanti',
     name: 'Dorobanți',
     imageUrl: 'img/cartiere/dorobanti.jpg',
+    deviceIds: ['160001AE'],
+  },
+  {
+    id: 'bucurestiinoi',
+    name: 'Bucureștii Noi',
+    imageUrl: 'img/cartiere/bucurestiinoi.jpg',
     deviceIds: ['160001AF'],
   },
 ];
@@ -75,16 +81,15 @@ function drawNeighborhoods() {
 
   pageRoot.innerHTML = '';
 
-  neighbourhoods
-    .forEach(({ id, name, imageUrl }) => {
-      const overallGrade = getAirQualityForNeighbourhood(id);
+  neighbourhoods.forEach(({ id, name, imageUrl }) => {
+    const overallGrade = getAirQualityForNeighbourhood(id);
 
-      const { pm1, pm25, pm10 } = getPmAveragesForNeighborhood(id);
+    const { pm1, pm25, pm10 } = getPmAveragesForNeighborhood(id);
 
-      const neighbourhoodHtml = getHtmlForNeighbourhood({ id, name, value: overallGrade, imageUrl, pm1, pm25, pm10 });
+    const neighbourhoodHtml = getHtmlForNeighbourhood({ id, name, value: overallGrade, imageUrl, pm1, pm25, pm10 });
 
-      pageRoot.insertAdjacentHTML('beforeend', neighbourhoodHtml);
-    });
+    pageRoot.insertAdjacentHTML('beforeend', neighbourhoodHtml);
+  });
 }
 
 async function getAndPopulateSensorList() {
@@ -150,7 +155,7 @@ function getAirQualityForNeighbourhood(neighbourhoodId) {
 
 function getPmAveragesForNeighborhood(neighbourhoodId) {
   const deviceIdsInNeighbourhood = neighbourhoods.find((x) => x.id == neighbourhoodId).deviceIds;
-  const devicesInNeighbourhood = allSensors.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter(x => !isBroken(x));
+  const devicesInNeighbourhood = allSensors.filter((x) => deviceIdsInNeighbourhood.includes(x.id)).filter((x) => !isBroken(x));
 
   let averages = {
     pm1: 0,
