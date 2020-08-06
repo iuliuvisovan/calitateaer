@@ -1,29 +1,58 @@
 const neighbourhoods = [
   {
-    id: 'grivita',
-    name: 'Grivița',
-    imageUrl: 'img/cartiere/grivita.png',
-    deviceIds: ['160001B2'],
+    id: 'domenii',
+    name: 'Domenii',
+    imageUrl: 'img/cartiere/domenii.jpg',
+    deviceIds: ['160001B0'],
   },
+  {
+    id: 'romana',
+    name: 'Romana',
+    imageUrl: 'img/cartiere/romana.jpg',
+    deviceIds: ['160001B1'],
+  },
+  // {
+  //   id: 'vatranoua',
+  //   name: 'Vatra Nouă',
+  //   imageUrl: 'img/cartiere/vatranoua.jpg',
+  //   deviceIds: ['160001B2'],
+  // },
   {
     id: 'garadenord',
     name: 'Gara de Nord',
-    imageUrl: 'img/cartiere/garadenord.png',
+    imageUrl: 'img/cartiere/garadenord.jpg',
     deviceIds: ['160001B3'],
+  },
+  {
+    id: 'aviatiei',
+    name: 'Aviației',
+    imageUrl: 'img/cartiere/aviatiei.jpg',
+    deviceIds: ['160001B4'],
   },
   {
     id: 'baneasa',
     name: 'Băneasa',
-    imageUrl: 'img/cartiere/baneasa.png',
+    imageUrl: 'img/cartiere/baneasa.jpg',
     deviceIds: ['160001B5'],
+  },
+  {
+    id: 'chitila',
+    name: 'Chitila',
+    imageUrl: 'img/cartiere/chitila.jpg',
+    deviceIds: ['160001B6'],
   },
   {
     id: 'bucurestiinoi',
     name: 'Bucureștii Noi',
-    imageUrl: 'img/cartiere/bucurestiinoi.png',
-    deviceIds: ['160001B7'],
+    imageUrl: 'img/cartiere/bucurestiinoi.jpg',
+    deviceIds: ['160001B7', '160001AF'],
   },
-
+  {
+    id: 'dorobanti',
+    name: 'Dorobanți',
+    imageUrl: 'img/cartiere/dorobanti.jpg',
+    deviceIds: ['160001AF'],
+  },
 ];
 
 let allSensors = [];
